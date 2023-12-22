@@ -2,14 +2,15 @@
  * Класс CreateTransactionForm управляет формой
  * создания новой транзакции
  * */
-class CreateTransactionForm extends AsyncForm {
+ class CreateTransactionForm extends AsyncForm {
   /**
    * Вызывает родительский конструктор и
    * метод renderAccountsList
    * */
   constructor(element) {
-    super(element);
-    this.renderAccountsList();
+    super(element)
+    this.renderAccountsList()
+    this.element = element
   }
 
   /**
@@ -17,16 +18,19 @@ class CreateTransactionForm extends AsyncForm {
    * Обновляет в форме всплывающего окна выпадающий список
    * */
   renderAccountsList() {
-    Account.list(User.current(), (response) => {
+    const modaAccList = this.element.querySelector("select.accounts-select")
+    modaAccList.innerHTML = ""
+    const data = User.current()
+    Account.list(data, (err, response) => {
       if (response.success) {
-          const accountSelect = this.element.querySelector('.accounts-select');
-          accountSelect.innerHTML = '';
-
-          response.data.forEach(account => {
-              accountSelect.innerHTML += `<option value="${account.id}">${account.name}</option>`;
-          });
+        response.data.forEach((accObj) =>
+          modaAccList.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${accObj.id}">${accObj.name}</option>`
+          )
+        )
       }
-  });
+    })
   }
 
   /**
@@ -36,12 +40,21 @@ class CreateTransactionForm extends AsyncForm {
    * в котором находится форма
    * */
   onSubmit(data) {
-    Transaction.create(data, (response) => {
+    Transaction.create(data, (err, response) => {
       if (response.success) {
-          App.getModal(this.element.closest('.modal').dataset.modalId).close();
-          this.element.reset();
-          App.update();
+        let modalName
+        switch (data.type) {
+          case "expense":
+            modalName = "newExpense"
+            break
+          case "income":
+            modalName = "newIncome"
+            break
+        }
+        document.forms[`new-${data.type}-form`].reset()
+        App.getModal(modalName).close()
+        App.update()
       }
-  });
+    })
   }
 }

@@ -3,13 +3,13 @@
  * кнопки скрытия/показа колонки в мобильной версии сайта
  * и за кнопки меню
  * */
-class Sidebar {
+ class Sidebar {
   /**
    * Запускает initAuthLinks и initToggleButton
    * */
   static init() {
-    this.initAuthLinks();
-    this.initToggleButton();
+    this.initAuthLinks()
+    this.initToggleButton()
   }
 
   /**
@@ -17,15 +17,14 @@ class Sidebar {
    * переключает два класса для body: sidebar-open и sidebar-collapse
    * при нажатии на кнопку .sidebar-toggle
    * */
-   static initToggleButton() {
-    const toggleButton = document.querySelector('.sidebar-toggle');
-    const body = document.querySelector('body');
-
-    toggleButton.addEventListener('click', function(event) {
-        event.preventDefault();
-        body.classList.toggle('sidebar-open');
-        body.classList.toggle('sidebar-collapse');
-    });
+  static initToggleButton() {
+    const sidebarBtn = document.querySelector("a.sidebar-toggle")
+    sidebarBtn.addEventListener("click", (ev) => {
+      ev.preventDefault()
+      const sidebarMini = document.querySelector("body.sidebar-mini")
+      sidebarMini.classList.toggle("sidebar-open")
+      sidebarMini.classList.toggle("sidebar-collapse")
+    })
   }
 
   /**
@@ -36,27 +35,22 @@ class Sidebar {
    * выходу устанавливает App.setState( 'init' )
    * */
   static initAuthLinks() {
-    const loginButton = document.querySelector('.menu-item_login');
-    const registerButton = document.querySelector('.menu-item_register');
-    const logoutButton = document.querySelector('.menu-item_logout');
-
-    const loginModal = App.getModal('login');
-    const registerModal = App.getModal('register');
-
-    loginButton.addEventListener('click', () => {
-        loginModal.open();
-    });
-
-    registerButton.addEventListener('click', () => {
-        registerModal.open();
-    });
-
-    logoutButton.addEventListener('click', () => {
-        User.logout((response) => {
-            if (response.success) {
-                App.setState('init');
-            }
-        });
-    });
+    const sidebarCtrlBtns = document.querySelectorAll(".sidebar-menu")
+    sidebarCtrlBtns.forEach((button) => {
+      button.addEventListener("click", (ev) => {
+        ev.preventDefault()
+        switch (ev.target.closest("li").classList[1]) {
+          case "menu-item_login":
+            App.getModal("login").open()
+            break
+          case "menu-item_register":
+            App.getModal("register").open()
+            break
+          case "menu-item_logout":
+            User.logout((response) => App.setState("init"))
+            break
+        }
+      })
+    })
   }
 }

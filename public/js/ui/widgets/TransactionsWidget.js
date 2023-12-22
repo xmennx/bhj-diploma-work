@@ -4,19 +4,19 @@
  * создания нового дохода или расхода
  * */
 
-class TransactionsWidget {
+ class TransactionsWidget {
   /**
    * Устанавливает полученный элемент
    * в свойство element.
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor( element ) {
+  constructor(element) {
     if (!element) {
-      throw new Error("Элемент не найден");
-  }
-  this.element = element;
-  this.registerEvents();
+      throw new Error("Невалидное значение для TransactionsWidget")
+    }
+    this.element = element
+    this.registerEvents()
   }
   /**
    * Регистрирует обработчики нажатия на
@@ -25,12 +25,21 @@ class TransactionsWidget {
    * экземпляра окна
    * */
   registerEvents() {
-    this.element.querySelector('.create-income-button').addEventListener('click', () => {
-      App.getModal('newIncome').open();
-  });
-
-  this.element.querySelector('.create-expense-button').addEventListener('click', () => {
-      App.getModal('newExpense').open();
-  });
+    const transactionBtns = document.querySelectorAll(
+      ".transactions-panel > button"
+    )
+    transactionBtns.forEach((button) => {
+      button.addEventListener("click", (ev) => {
+        ev.preventDefault()
+        switch (ev.target.closest("button").classList[3]) {
+          case "create-income-button":
+            App.getModal("newIncome").open()
+            break
+          case "create-expense-button":
+            App.getModal("newExpense").open()
+            break
+        }
+      })
+    })
   }
 }
